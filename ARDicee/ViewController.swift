@@ -19,11 +19,31 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         // Set the view's delegate
         sceneView.delegate = self
         
-        // Create a new scene
-        let scene = SCNScene(named: "art.scnassets/ship.scn")!
+        let cube = SCNBox(width: 0.1, height: 0.1, length: 0.1, chamferRadius: 0.01) //사각형
         
-        // Set the scene to the view
-        sceneView.scene = scene
+        let material = SCNMaterial() //물체 표면 속성
+        
+        material.diffuse.contents = UIColor.red
+        
+        cube.materials = [material]
+        
+        let node = SCNNode() //콘텐츠를 연결할 수 있는 3D 좌표 공간에서 위치와 변환을 나타내는 장면 그래프의 구조 요소
+        
+        node.position = SCNVector3(0, 0.1, -0.5)
+        
+        node.geometry = cube
+        
+        sceneView.scene.rootNode.addChildNode(node)
+        
+        //주사위가 3D처럼 보이지 않는다. 빛을 추가하자.
+        sceneView.autoenablesDefaultLighting = true
+        
+        
+//        // Create a new scene
+//        let scene = SCNScene(named: "art.scnassets/ship.scn")!
+//
+//        // Set the scene to the view
+//        sceneView.scene = scene
     }
     
     override func viewWillAppear(_ animated: Bool) {
