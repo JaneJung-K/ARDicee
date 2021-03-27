@@ -44,17 +44,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         sceneView.autoenablesDefaultLighting = true
         
         
-        // Create a new scene
-//        let dicescene = SCNScene(named: "art.scnassets/diceCollada.scn")!
-//
-//        //실제적으로 Dice에는 recursively: true 할 것이 없지만 좋은 습관이다.
-//        if let diceNode = dicescene.rootNode.childNode(withName: "Dice", recursively: true) {
-//
-//        diceNode.position = SCNVector3(0, 0, -0.1)
-//
-//        sceneView.scene.rootNode.addChildNode(diceNode)
-//
-//        }
+
 
        
     }
@@ -86,12 +76,24 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             if let query = sceneView.raycastQuery(from: touchLocation, allowing: .existingPlaneGeometry, alignment: .any) {
                 let results = sceneView.session.raycast(query)
                 
-                //if results is not empty, 위치를 찾았다
-                if !results.isEmpty {
-                    print("touched the plane!")
-                } else {
-                    print("touched somewhere else")
+                if let hitResult = results.first {
+                    // Create a new scene
+                    let dicescene = SCNScene(named: "art.scnassets/diceCollada.scn")!
+            
+                    //실제적으로 Dice에는 recursively: true 할 것이 없지만 좋은 습관이다.
+                    if let diceNode = dicescene.rootNode.childNode(withName: "Dice", recursively: true) {
+            
+                    diceNode.position = SCNVector3(
+                        hitResult.worldTransform.columns.3.x,
+                        hitResult.worldTransform.columns.3.y + diceNode.boundingSphere.radius,
+                        hitResult.worldTransform.columns.3.z)
+            
+                    sceneView.scene.rootNode.addChildNode(diceNode)
+            
+                    }
+                    
                 }
+
             }
         }
     }
