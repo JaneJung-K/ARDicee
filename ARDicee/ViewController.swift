@@ -19,19 +19,21 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         // Set the view's delegate
         sceneView.delegate = self
         
-        let cube = SCNBox(width: 0.1, height: 0.1, length: 0.1, chamferRadius: 0.01) //사각형
+        //let cube = SCNBox(width: 0.1, height: 0.1, length: 0.1, chamferRadius: 0.01) //사각형
+        
+        let sphere = SCNSphere(radius: 0.2)
         
         let material = SCNMaterial() //물체 표면 속성
         
-        material.diffuse.contents = UIColor.red
+        material.diffuse.contents = UIImage(named: "art.scnassets/moon.jpg")
         
-        cube.materials = [material]
+        sphere.materials = [material]
         
         let node = SCNNode() //콘텐츠를 연결할 수 있는 3D 좌표 공간에서 위치와 변환을 나타내는 장면 그래프의 구조 요소
         
         node.position = SCNVector3(0, 0.1, -0.5)
         
-        node.geometry = cube
+        node.geometry = sphere
         
         sceneView.scene.rootNode.addChildNode(node)
         
