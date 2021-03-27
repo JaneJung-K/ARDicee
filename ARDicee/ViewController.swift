@@ -16,6 +16,9 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        //화면 뒤에서 무슨일이 일어나고 있는 지 보여줌 평면 감지를 활성화해서 특징점을 찾고 있다. 반짝이는 점들로 특징 포인트가 쉽게 감지되지 않는다는 걸 알 수 있다.
+        self.sceneView.debugOptions = [ARSCNDebugOptions.showFeaturePoints]
+        
         // Set the view's delegate
         sceneView.delegate = self
         
@@ -42,16 +45,16 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         
         
         // Create a new scene
-        let dicescene = SCNScene(named: "art.scnassets/diceCollada.scn")!
-        
-        //실제적으로 Dice에는 recursively: true 할 것이 없지만 좋은 습관이다.
-        if let diceNode = dicescene.rootNode.childNode(withName: "Dice", recursively: true) {
-        
-        diceNode.position = SCNVector3(0, 0, -0.1)
-        
-        sceneView.scene.rootNode.addChildNode(diceNode)
-        
-        }
+//        let dicescene = SCNScene(named: "art.scnassets/diceCollada.scn")!
+//
+//        //실제적으로 Dice에는 recursively: true 할 것이 없지만 좋은 습관이다.
+//        if let diceNode = dicescene.rootNode.childNode(withName: "Dice", recursively: true) {
+//
+//        diceNode.position = SCNVector3(0, 0, -0.1)
+//
+//        sceneView.scene.rootNode.addChildNode(diceNode)
+//
+//        }
 
        
     }
@@ -62,8 +65,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         // Create a session configuration
         let configuration = ARWorldTrackingConfiguration()
         
-        print("Session is supported = \(ARConfiguration.isSupported)")
-        print("World Tracking is supported = \(ARWorldTrackingConfiguration.isSupported)")
+        configuration.planeDetection = .horizontal
 
         // Run the view's session
         sceneView.session.run(configuration)
@@ -77,5 +79,37 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         sceneView.session.pause()
     }
 
+    func renderer(_ renderer: SCNSceneRenderer, didAdd node: SCNNode, for anchor: ARAnchor) {
+        if anchor is ARPlaneAnchor {
+            
+            let planeAnchor = anchor as! ARPlaneAnchor
+            
+            //수직인 평면이 만들어졌다
+            let plane = SCNPlane(width: CGFloat(planeAnchor.extent.x), height: CGFloat(planeAnchor.extent.z))
+            
+            let planeNode = SCNNode()
+            
+            //x축 시계방향으로 회전시킨다
+            planeNode.position = SCNVector3(planeAnchor.center.x, 0, planeAnchor.center.z)
+            
+            planeNode.transform = SCNMatrix4MakeRotation(-Float.pi/2, 1, 0, 0)
+            
+            //애플에서 제공하는 gird.png 다운
+            let gridMaterial = SCNMaterial()
+            
+            gridMaterial.diffuse.contents = UIImage(named: "art.scnassets/gird.png")
+            
+            plane.materials = [gridMaterial]
+            
+            planeNode.geometry = plane
+            
+            //수평면에 그리드가 깔렸다
+            node.addChildNode(planeNode)
+            
+            
+        } else {
+            return
+        }
+    }
 
 }
